@@ -1,0 +1,20 @@
+I want a plugin that shows a list of all my blorped places.
+I want it to have the same look and feel as ../beings-discworld-xp-timers
+It should have a "start recording" command that I run first.
+Every item it finds with an identification it should log to a file.
+Make sure there are no duplicated entries.
+Here's an example of me looking at identified jewellery:
+
+locate necklaces in pack
+The ruby wedding necklace ("smugglers") is in the hunter's pack.
+The twisting myrtle necklet ("savannah") is in the hunter's pack.
+The ruby wedding necklace ("dojo") is in the hunter's pack.
+The twisting myrtle necklet ("casino") is in the hunter's pack.
+The twisting myrtle necklet ("lancre") is in the hunter's pack.
+
+The identification is the string between (" and ").
+It should log all identified jewellery (rings, necklaces, anklets, navel studs, earrings, bracelets, necklets, toe rings, pins). But don't limit yourself to a fixed list of jewellery types. Anything identified i look at efter /blorps_rec_start and before /blorps_rec_stop should be logged.
+There should be a command to remove specific items from the list. So if "dojo" is logged from the example before I should be able to do /blorps_remove dojo and that should remove it from the list.
+
+Ask me any questions you might need to complete the task.
+Use the plugin documentation from https://mallard.vnsf.xyz/docs/mallard-plugin-dev-v0.25.0.html for any references.

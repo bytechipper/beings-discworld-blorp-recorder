@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Being's Discworld Blorp Recorder</title>
+    <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+    <div class="panel">
+        <div class="search-row">
+            <input id="search" type="search" placeholder="Search blorps…" aria-label="Search blorps" autocomplete="off">
+            <button class="btn" id="clear-search">Clear</button>
+        </div>
+        <section class="section recorder-section" aria-label="Blorp recorder controls">
+            <div class="recorder-info">
+                <span class="recorder-title">Blorp Recorder</span>
+                <span id="status" role="status">Loading…</span>
+            </div>
+            <div class="recorder-buttons">
+                <button class="btn" id="start" aria-label="Start recording" disabled>Start</button>
+                <button class="btn" id="stop" aria-label="Stop recording" disabled>Stop</button>
+            </div>
+        </section>
+        <section class="section">
+            <div class="section-header">Blorped Places <span id="count">0</span></div>
+            <p class="hint" id="empty">Start recording, then look at or locate identified items.</p>
+            <ul id="places" aria-label="Saved blorped places"></ul>
+        </section>
+    </div>
+    <script src="panel.js"></script>
+</body>
+</html>
