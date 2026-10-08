@@ -8,11 +8,17 @@ import zipfile
 root = Path(__file__).resolve().parent.parent
 manifest = tomllib.loads((root / "plugin.toml").read_text())
 output = Path(sys.argv[1]) if len(sys.argv) > 1 else root / "dist" / (
-    "beings-discworld-blorp-recorder-" + manifest["version"] + ".mallardx"
+    root.name + "-" + manifest["version"] + ".mallardx"
 )
 output.parent.mkdir(parents=True, exist_ok=True)
 files = [root / name for name in ("plugin.toml", "LICENSE", "README.md")]
-files += [p for directory in ("src", "ui") for p in (root / directory).rglob("*") if p.is_file()]
+extensions = {"src": {".lua"}, "ui": {".html", ".css", ".js"}, "assets": {".png"}}
+for directory, allowed in extensions.items():
+    for path in (root / directory).rglob("*"):
+        if path.is_symlink():
+            raise ValueError("Symlinks are not allowed: " + str(path))
+        if path.is_file() and path.suffix in allowed:
+            files.append(path)
 with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
     for path in sorted(files):
         entry = zipfile.ZipInfo(path.relative_to(root).as_posix(), date_time=(2026, 1, 1, 0, 0, 0))

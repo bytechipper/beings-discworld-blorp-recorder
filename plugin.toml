@@ -1,11 +1,11 @@
 id = "net.discworld.beings-discworld-blorp-recorder"
 name = "Being's Discworld Blorp Recorder"
 description = "Record identified items as a deduplicated list of Discworld blorp places, with instant search and Go/See buttons."
-version = "1.0.4"
+version = "1.0.5"
 language = "lua"
 entry = "src/main.lua"
 mallard_api_version = "1.0"
-minimum_app_version = "0.25.0"
+minimum_app_version = "0.27.0"
 authors = ["duzchip"]
 license = "MIT"
 

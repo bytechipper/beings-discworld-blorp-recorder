@@ -43,3 +43,7 @@ Run `rpmlua tests/recorder_test.lua` (Lua 5.3) from the plugin directory. The te
 ## Build
 
 Run `python3 scripts/build.py` with Python 3.11 or later. The build includes only the manifest, Lua source, panel assets, license, and README, with fixed ZIP timestamps for repeatable output. For marketplace CI, run `python3 scripts/build.py net.discworld.beings-discworld-blorp-recorder.mallardx`.
+
+## Compatibility and testing
+
+Validated against Mallard 0.27.0 (API 1.0). Run `python3 -m unittest discover -s tests -v` with the Lua 5.4 shared library installed. Run `python3 tests/panel_test.py` with Playwright and Chromium installed. Build with `python3 scripts/build.py`.
