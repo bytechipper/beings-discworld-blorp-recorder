@@ -4,7 +4,7 @@ A Mallard plugin listing saved blorp identifications in a dockable panel, styled
 
 ## Install
 
-Install `dist/beings-discworld-blorp-recorder-1.0.4.mallardx` using **Plugin manager → Install from file…**, then enable it for your Discworld world. For development, place the unpacked plugin in Mallard's dev plugins folder and reload plugins.
+Install `dist/beings-discworld-blorp-recorder-1.0.7.mallardx` using **Plugin manager → Install from file…**, then enable it for your Discworld world. For development, place the unpacked plugin in Mallard's dev plugins folder and reload plugins.
 
 ## Panel preview
 
@@ -18,6 +18,7 @@ This preview uses sample data in a standalone browser.
 | --- | --- |
 | `/blorps_rec_start` | Start recording identifications in incoming MUD text. |
 | `/blorps_rec_stop` | Stop recording. |
+| `/blorps_clear` | Clear all saved places for the current character and stop recording. |
 | `/blorps` | Print all saved places and recording status. |
 | `/blorps_remove dojo` | Remove the exact identification `dojo`. |
 | `/blorps_remove two words` | Remove an identification containing spaces; do not add quotes. |
@@ -30,7 +31,11 @@ After starting recording, run your usual `locate necklaces in pack`, look, inven
 
 ## Persistence
 
-Each addition and removal is saved immediately through Mallard's persistent JSON `storage` API, under key `blorps`, separately for each world and plugin. The saved value has the form `{ "version": 1, "places": ["casino", "dojo"] }`. Failed writes are reported and leave the saved and displayed list unchanged.
+Blorps are saved separately for each logged-in character (case-insensitive name), within each world and plugin. The name comes from Discworld's GMCP `char.info` message, including the mirrored name when enabling the plugin mid-session. The panel shows the active character. Switching characters stops recording and loads that character's list; disconnecting clears the active list. Recording is unavailable until the server reports a character name.
+
+Each addition and removal is saved immediately through Mallard's persistent JSON `storage` API under key `blorps`, using version 2 with a `characters` map. Failed writes leave saved and displayed places unchanged.
+
+Existing version 1 shared lists are preserved separately, since their owner cannot be determined. After logging into the character that should own them, run `/blorps_import_legacy` to copy them into that character's list. If you import into the wrong character, run `/blorps_clear` while logged into that character. This clears only their list and stops recording; other characters and the old shared list are preserved. The original shared list remains available for another import; it is never automatically shown for other characters.
 
 Mallard's Lua sandbox removes `io` and `os` and documents `storage` as its persistence mechanism. This plugin therefore uses host-managed JSON storage rather than writing a user-selected text file. The UI does not claim a successful save when storage raises an error.
 

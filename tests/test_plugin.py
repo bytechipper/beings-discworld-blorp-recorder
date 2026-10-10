@@ -123,7 +123,7 @@ class PluginTests(unittest.TestCase):
         source = '\n'.join(path.read_text() for path in (ROOT / 'src').glob('*.lua'))
         if re.search(r'mud\.send(?:_raw)?\s*\(', source): self.assertTrue(permissions['sends'])
         if re.search(r'db\.(?:query|exec|transaction)\s*\(', source): self.assertTrue(permissions.get('database'))
-        for package in re.findall(r'gmcp\.on\("([^"\n]+)"', source):
+        for package in re.findall(r'gmcp\.(?:on|get)\("([^"\n]+)"', source):
             self.assertIn(package, permissions.get('gmcp_access', []))
         self.assertFalse(permissions.get('network'))
 

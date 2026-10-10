@@ -9,6 +9,11 @@ storage = {
         saved = value
     end,
 }
+local gmcp_handlers = {}
+gmcp = {
+    get = function(key) if key == "char.info.name" then return "Alice" end end,
+    on = function(name, callback) gmcp_handlers[name] = callback end,
+}
 local sent = {}
 mud = {
     send = function(text) sent[#sent + 1] = text end,
@@ -83,7 +88,7 @@ assert(#latest().places == 6)
 events.disconnect()
 assert(not latest().recording)
 line('A ring ("after disconnect")')
-assert(#latest().places == 6)
+assert(#latest().places == 0 and latest().character == nil)
 dofile("src/main.lua")
 messages.ready()
 assert(#latest().places == 6 and not latest().recording)
@@ -103,6 +108,66 @@ messages.see({name = "dojo\rquit"})
 messages.see({name = 42})
 messages.see(nil)
 assert(#sent == send_count)
+-- Switching characters isolates lists and stops recording; names ignore case.
+gmcp_handlers["char.info"]("char.info", {name = "Bob"})
+assert(latest().character == "bob" and #latest().places == 0 and not latest().recording)
+messages.go({name = "dojo"})
+assert(#sent == send_count)
+messages.start()
+line('A ring ("bob only")')
+assert(#latest().places == 1)
+gmcp_handlers["char.info"]("char.info", {name = "ALICE"})
+assert(#latest().places == 7 and not latest().recording)
+gmcp_handlers["char.info"]("char.info", {name = "Bob"})
+assert(latest().places[1] == "bob only")
+events.disconnect()
+messages.start()
+line('A ring ("unknown")')
+assert(not latest().recording and #latest().places == 0)
+-- Old shared data is retained until explicitly copied to a known character.
+saved = {version = 1, places = {"old shared"}}
+dofile("src/main.lua")
+messages.ready()
+assert(#latest().places == 0 and latest().legacy_count == 1)
+fail = true
+commands.blorps_import_legacy()
+assert(#latest().places == 0 and saved.version == 1)
+fail = false
+commands.blorps_import_legacy()
+assert(latest().places[1] == "old shared" and saved.version == 2)
+assert(saved.legacy[1] == "old shared")
+gmcp_handlers["char.info"]("char.info", {name = "Bob"})
+assert(#latest().places == 0)
+dofile("src/main.lua")
+messages.ready()
+assert(latest().places[1] == "old shared")
+-- Clearing is persisted, isolated, and leaves memory unchanged on write failure.
+gmcp_handlers["char.info"]("char.info", {name = "Bob"})
+messages.start()
+line('A ring ("bob keep")')
+gmcp_handlers["char.info"]("char.info", {name = "Alice"})
+messages.start()
+fail = true
+local before_clear = writes
+commands.blorps_clear()
+assert(writes == before_clear and latest().places[1] == "old shared" and latest().recording)
+fail = false
+commands.blorps_clear()
+assert(#latest().places == 0 and not latest().recording)
+assert(notes[#notes]:find("Cleared all places for alice", 1, true))
+line('A ring ("must not return")')
+assert(#latest().places == 0)
+assert(saved.legacy[1] == "old shared" and saved.characters.bob[1] == "bob keep")
+dofile("src/main.lua")
+messages.ready()
+assert(#latest().places == 0)
+gmcp_handlers["char.info"]("char.info", {name = "Bob"})
+assert(latest().places[1] == "bob keep")
+events.disconnect()
+local before_unknown = writes
+commands.blorps_clear()
+assert(writes == before_unknown)
+assert(notes[#notes]:find("Waiting for", 1, true))
 local write_count = writes
 saved = { version = 99, places = {} }
 assert(not pcall(dofile, "src/main.lua"))

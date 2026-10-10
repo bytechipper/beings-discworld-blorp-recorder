@@ -1,7 +1,7 @@
 id = "net.discworld.beings-discworld-blorp-recorder"
 name = "Being's Discworld Blorp Recorder"
 description = "Record identified items as a deduplicated list of Discworld blorp places, with instant search and Go/See buttons."
-version = "1.0.5"
+version = "1.0.7"
 language = "lua"
 entry = "src/main.lua"
 mallard_api_version = "1.0"
@@ -14,6 +14,7 @@ match = ["discworld.starturtle.net:*"]
 
 [permissions]
 sends = true
+gmcp_access = ["char.info", "char.info.name", "Char.Info", "Char.Info.name"]
 notifications = false
 keychain = false
 network = []

@@ -18,7 +18,7 @@ with sync_playwright() as p:
         };
     """)
     page.goto((root / "ui/panel.html").as_uri())
-    page.evaluate("window.handlers.update({recording: false, places: ['casino', 'dojo', 'lancre', 'savannah', 'smugglers']})")
+    page.evaluate("window.handlers.update({character: 'alice', recording: false, places: ['casino', 'dojo', 'lancre', 'savannah', 'smugglers']})")
     assert page.locator(".place-entry").count() == 5
     assert page.locator("#stop").is_disabled()
     page.locator("#search").fill("DOJ")
@@ -44,11 +44,11 @@ with sync_playwright() as p:
     page.locator("#search").fill("")
     assert page.locator(".place-entry").count() == 5
     page.locator("#search").fill("dojo")
-    page.evaluate("window.handlers.update({recording: true, places: ['casino', 'dojo', 'dojo annex']})")
+    page.evaluate("window.handlers.update({character: 'alice', recording: true, places: ['casino', 'dojo', 'dojo annex']})")
     assert page.locator(".place-entry").count() == 2
     assert page.locator("#start").is_disabled()
     page.locator("#clear-search").click()
-    page.evaluate("window.handlers.update({recording: false, places: ['casino', 'dojo', 'lancre', 'savannah', 'smugglers']})")
+    page.evaluate("window.handlers.update({character: 'alice', recording: false, places: ['casino', 'dojo', 'lancre', 'savannah', 'smugglers']})")
     assert not errors, errors
     if len(sys.argv) > 1:
         page.screenshot(path=sys.argv[1])

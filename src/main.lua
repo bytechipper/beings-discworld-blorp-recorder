@@ -6,9 +6,18 @@ local function update()
     panel:post("update", Recorder.display())
 end
 
+-- Read mirrored identity when enabled during an existing session.
+Recorder.set_character(gmcp.get("char.info.name") or gmcp.get("Char.Info.name"))
+
+local function identity(_, data)
+    if type(data) == "table" and data.name ~= nil and Recorder.set_character(data.name) then update() end
+end
+gmcp.on("char.info", identity)
+gmcp.on("Char.Info", identity)
+
 local function set_recording(value)
     Recorder.set_recording(value)
-    mud.note("[blorps] Recording " .. (value and "started." or "stopped."), { fg = "cyan" })
+    mud.note("[blorps] Recording " .. (Recorder.display().recording and "started." or "stopped."), { fg = "cyan" })
     update()
 end
 
@@ -35,15 +44,34 @@ mud.command("blorps_remove", function(m) remove(m.args) end,
 mud.command("blorps", function()
     local data = Recorder.display()
     mud.note(".:: Blorped Places ::.", { bold = true })
+    mud.note("Character: " .. (data.character or "waiting for login"))
     mud.note("Recording: " .. (data.recording and "on" or "off"))
     for _, name in ipairs(data.places) do mud.note(" - " .. name) end
     mud.note(tostring(#data.places) .. " places saved.")
 end, { description = "List saved blorped places" })
 
+mud.command("blorps_clear", function()
+    local ok, reason = Recorder.clear()
+    if ok then
+        mud.note("[blorps] Cleared all places for " .. Recorder.display().character .. "; recording stopped.", { fg = "green" })
+        update()
+    elseif reason == "character" then
+        mud.note("[blorps] Waiting for the logged-in character name from Discworld.", { fg = "yellow" })
+    end
+end, { description = "Clear all saved blorps for the current character and stop recording" })
+
+mud.command("blorps_import_legacy", function()
+    if Recorder.import_legacy() then
+        mud.note("[blorps] Imported old shared places for " .. Recorder.display().character .. ".", { fg = "green" })
+        update()
+    end
+end, { description = "Copy the old shared blorps into the current character's list" })
+
 world.on("line", function(line)
     if Recorder.record(line.text) then update() end
 end)
 world.on("disconnect", function()
+    Recorder.set_character(nil)
     Recorder.set_recording(false)
     update()
 end)

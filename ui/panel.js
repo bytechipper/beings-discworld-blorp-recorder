@@ -48,11 +48,12 @@ function renderPlaces() {
     }
 }
 window.panel.on("update", function (data) {
+    document.getElementById("character").textContent = data.character ? "Character: " + data.character : "Waiting for login…";
     allPlaces = Array.isArray(data.places) ? data.places : [];
     const status = document.getElementById("status");
     status.textContent = data.recording ? "Recording" : "Stopped";
     status.className = data.recording ? "recording" : "hint";
-    start.disabled = data.recording;
+    start.disabled = data.recording || !data.character;
     stop.disabled = !data.recording;
     renderPlaces();
 });
